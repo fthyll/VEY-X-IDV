@@ -13,10 +13,13 @@ const state = {
     countdownInterval: null,
     isRefreshing: false,
     lastStatus: null,
+    lastRefreshTime: null,
     playtime: {
         hours: 3885,
         minutes: 30
-    }
+    },
+    lastUserStatus: null, // 'offline', 'online', 'ingame'
+    playtimeActive: false // Status apakah playtime sedang aktif bertambah
 };
 
 // DOM ELEMENTS
@@ -74,7 +77,49 @@ function formatTime(date) {
 }
 
 function formatPlaytime(hours, minutes) {
-    return `${hours} h ${minutes} m`;
+    return `${formatNumber(hours)} h ${minutes} m`;
+}
+
+// TIME-BASED BACKGROUND FUNCTIONS
+function setTimeBasedBackground() {
+    const hour = new Date().getHours();
+    const body = document.body;
+    
+    // Hapus semua kelas waktu sebelumnya
+    body.classList.remove('time-morning', 'time-afternoon', 'time-evening', 'time-night', 'time-day');
+    
+    // Tentukan waktu dan set class yang sesuai
+    if (hour >= 4 && hour < 12) {
+        // Pagi: 04:00 - 11:59
+        body.classList.add('time-morning');
+        updateTimeIndicator('🌅 Pagi', hour);
+    } else if (hour >= 12 && hour < 17) {
+        // Siang: 12:00 - 16:59
+        body.classList.add('time-afternoon');
+        updateTimeIndicator('☀️ Siang', hour);
+    } else if (hour >= 17 && hour < 20) {
+        // Sore: 17:00 - 19:59
+        body.classList.add('time-evening');
+        updateTimeIndicator('🌇 Sore', hour);
+    } else {
+        // Malam: 20:00 - 03:59
+        body.classList.add('time-night');
+        updateTimeIndicator('🌙 Malam', hour);
+    }
+}
+
+function updateTimeIndicator(timeText, hour) {
+    let timeIndicator = document.querySelector('.time-indicator');
+    
+    if (!timeIndicator) {
+        timeIndicator = document.createElement('div');
+        timeIndicator.className = 'time-indicator';
+        document.body.appendChild(timeIndicator);
+    }
+    
+    const minutes = new Date().getMinutes().toString().padStart(2, '0');
+    const timeIcon = timeText.split(' ')[0];
+    timeIndicator.innerHTML = `<i>${timeIcon}</i> ${timeText} ${hour}:${minutes}`;
 }
 
 // COUNTDOWN TIMER
@@ -97,6 +142,38 @@ function startCountdown() {
     }, 1000);
 }
 
+// UPDATE PLAYTIME FUNCTION
+function updatePlaytime() {
+    const now = new Date();
+    
+    // Jika ini pertama kali atau status berubah
+    if (!state.lastRefreshTime) {
+        state.lastRefreshTime = now;
+        return;
+    }
+    
+    // Hitung selisih waktu dalam menit sejak refresh terakhir
+    const diffInMinutes = Math.floor((now - state.lastRefreshTime) / (1000 * 60));
+    
+    if (diffInMinutes > 0 && state.playtimeActive) {
+        // Update playtime berdasarkan waktu yang berlalu
+        state.playtime.minutes += diffInMinutes;
+        
+        // Konversi menit ke jam jika lebih dari 60
+        while (state.playtime.minutes >= 60) {
+            state.playtime.hours += 1;
+            state.playtime.minutes -= 60;
+        }
+        
+        // Update tampilan
+        elements.playtime.textContent = formatPlaytime(state.playtime.hours, state.playtime.minutes);
+        
+        console.log(`Playtime updated: +${diffInMinutes} minutes`);
+    }
+    
+    state.lastRefreshTime = now;
+}
+
 // UPDATE UI FUNCTIONS
 function updateLastUpdateTime() {
     const now = new Date();
@@ -111,21 +188,33 @@ function updateStatusUI(data) {
     const isInGame = presenceType === 2;
     const isInIndoVoice = data.isInIndoVoice || false;
     
-    // Update status indicator
+    // Simpan status sebelumnya
+    const previousStatus = state.lastUserStatus;
+    
+    // Update status indicator dan tentukan apakah playtime aktif
     if (!isOnline) {
-        // OFFLINE
+        // OFFLINE - Playtime TIDAK aktif
         elements.statusIndicator.className = 'status-indicator offline';
         elements.statusText.textContent = 'OFFLINE';
         elements.avatarStatus.className = '';
+        elements.avatarStatus.classList.remove('online', 'ingame');
+        
+        state.lastUserStatus = 'offline';
+        state.playtimeActive = false;
         
         // Hide game info
         elements.gameInfoSection.style.display = 'none';
         
+        console.log('Status: OFFLINE - Playtime tidak aktif');
+        
     } else if (isInIndoVoice) {
-        // IN INDO VOICE
+        // IN INDO VOICE - Playtime AKTIF
         elements.statusIndicator.className = 'status-indicator ingame';
         elements.statusText.textContent = 'INDO VOICE';
         elements.avatarStatus.className = 'avatar-status ingame';
+        
+        state.lastUserStatus = 'ingame';
+        state.playtimeActive = true;
         
         // Show game info
         elements.gameInfoSection.style.display = 'block';
@@ -133,19 +222,16 @@ function updateStatusUI(data) {
         elements.gameStatus.textContent = 'Online';
         elements.joinButton.style.display = 'inline-flex';
         
-        // Update playtime (increment by 1 minute)
-        state.playtime.minutes += 1;
-        if (state.playtime.minutes >= 60) {
-            state.playtime.hours += 1;
-            state.playtime.minutes = 0;
-        }
-        elements.playtime.textContent = formatPlaytime(state.playtime.hours, state.playtime.minutes);
+        console.log('Status: IN INDO VOICE - Playtime aktif');
         
     } else if (isInGame) {
-        // IN OTHER GAME
+        // IN OTHER GAME - Playtime AKTIF
         elements.statusIndicator.className = 'status-indicator ingame';
         elements.statusText.textContent = 'IN GAME';
         elements.avatarStatus.className = 'avatar-status ingame';
+        
+        state.lastUserStatus = 'ingame';
+        state.playtimeActive = true;
         
         // Show game info
         elements.gameInfoSection.style.display = 'block';
@@ -153,17 +239,34 @@ function updateStatusUI(data) {
         elements.gameStatus.textContent = 'Online';
         elements.joinButton.style.display = 'none';
         
+        console.log('Status: IN GAME - Playtime aktif');
+        
     } else {
-        // ONLINE (not in game)
+        // ONLINE (not in game) - Playtime AKTIF
         elements.statusIndicator.className = 'status-indicator online';
         elements.statusText.textContent = 'ONLINE';
         elements.avatarStatus.className = 'avatar-status online';
         
+        state.lastUserStatus = 'online';
+        state.playtimeActive = true;
+        
         // Hide game info
         elements.gameInfoSection.style.display = 'none';
+        
+        console.log('Status: ONLINE - Playtime aktif');
     }
     
-    // Update username if available
+    // Update playtime jika status berubah atau masih aktif
+    if (state.playtimeActive) {
+        updatePlaytime();
+        
+        // Jika status berubah dari offline ke online/ingame, beri pesan
+        if (previousStatus === 'offline') {
+            console.log('Status berubah dari OFFLINE menjadi AKTIF - Playtime mulai bertambah');
+        }
+    }
+    
+    // Update username jika tersedia
     if (data.username && data.username !== '7VeyForDey h3h3h3') {
         elements.username.textContent = data.username;
     }
@@ -172,14 +275,14 @@ function updateStatusUI(data) {
         elements.displayName.textContent = data.displayName;
     }
     
-    // Update avatar
+    // Update avatar dengan timestamp untuk menghindari cache
     if (data.avatarUrl) {
         elements.avatarImg.src = data.avatarUrl + '?t=' + new Date().getTime();
     }
     
     // Handle avatar error
     elements.avatarImg.onerror = function() {
-        this.src = CONFIG.AVATAR_URL;
+        this.src = CONFIG.AVATAR_URL + '?t=' + new Date().getTime();
     };
 }
 
@@ -211,15 +314,15 @@ async function fetchRobloxData() {
     } catch (error) {
         console.error('Error fetching data:', error);
         
-        // Return fallback data
+        // Return fallback data (untuk testing: online status)
         return {
             success: true,
-            userPresenceType: 2, // Default to "In Game" for testing
-            isInIndoVoice: true,
+            userPresenceType: 1, // Default ke "Online" untuk testing
+            isInIndoVoice: false,
             username: "7VeyForDey h3h3h3",
             displayName: "@VeyH3H3H3H3",
             avatarUrl: CONFIG.AVATAR_URL,
-            lastLocation: "Indo Voice"
+            lastLocation: ""
         };
     }
 }
@@ -242,6 +345,7 @@ async function refreshData() {
         updateLastUpdateTime();
         
         console.log('Data refreshed successfully');
+        console.log(`Current playtime: ${state.playtime.hours}h ${state.playtime.minutes}m`);
         
     } catch (error) {
         console.error('Refresh failed:', error);
@@ -271,8 +375,37 @@ function initializeStats() {
     // Format playtime
     elements.playtime.textContent = formatPlaytime(state.playtime.hours, state.playtime.minutes);
     
-    // Set avatar with timestamp
+    // Set avatar dengan timestamp untuk menghindari cache
     elements.avatarImg.src = CONFIG.AVATAR_URL + '?t=' + new Date().getTime();
+    
+    console.log(`Initial playtime: ${state.playtime.hours}h ${state.playtime.minutes}m`);
+}
+
+// REAL-TIME PLAYTIME UPDATER
+function startRealTimePlaytimeUpdater() {
+    // Update playtime setiap menit jika status aktif
+    setInterval(() => {
+        if (state.playtimeActive) {
+            // Tambah 1 menit
+            state.playtime.minutes += 1;
+            
+            // Konversi menit ke jam jika lebih dari 60
+            if (state.playtime.minutes >= 60) {
+                state.playtime.hours += 1;
+                state.playtime.minutes = 0;
+            }
+            
+            // Update tampilan
+            elements.playtime.textContent = formatPlaytime(state.playtime.hours, state.playtime.minutes);
+            
+            // Update last refresh time untuk perhitungan akurat
+            state.lastRefreshTime = new Date();
+            
+            console.log(`Playtime +1 minute (real-time): ${state.playtime.hours}h ${state.playtime.minutes}m`);
+        }
+    }, 60000); // Update setiap 1 menit
+    
+    console.log('Real-time playtime updater started');
 }
 
 // EVENT LISTENERS
@@ -299,16 +432,28 @@ function setupEventListeners() {
     
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'r' || e.key === 'R') {
-            e.preventDefault();
+        if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey) {
             refreshData();
         }
     });
     
-    // Auto-refresh when page becomes visible
+    // Auto-refresh ketika page menjadi visible
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
+            console.log('Page became visible, refreshing...');
             refreshData();
+        } else {
+            console.log('Page hidden');
+        }
+    });
+    
+    // Tab/window close warning untuk save playtime
+    window.addEventListener('beforeunload', (e) => {
+        if (state.playtimeActive) {
+            // Tampilkan pesan untuk memastikan playtime tersimpan
+            const message = 'Playtime masih berjalan. Pastikan untuk menyimpan progress?';
+            e.returnValue = message;
+            return message;
         }
     });
 }
@@ -317,8 +462,17 @@ function setupEventListeners() {
 async function initialize() {
     console.log('Initializing Roblox Profile Dashboard...');
     
+    // Setup time-based background
+    setTimeBasedBackground();
+    
+    // Update background setiap menit
+    setInterval(setTimeBasedBackground, 60000);
+    
     // Initialize stats
     initializeStats();
+    
+    // Start real-time playtime updater
+    startRealTimePlaytimeUpdater();
     
     // Setup event listeners
     setupEventListeners();
@@ -330,6 +484,7 @@ async function initialize() {
     startCountdown();
     
     console.log('Dashboard initialized successfully!');
+    console.log('Playtime akan bertambah setiap menit jika status ONLINE atau IN GAME');
 }
 
 // START APPLICATION

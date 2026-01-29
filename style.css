@@ -6,24 +6,33 @@
 }
 
 :root {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-card: rgba(51, 65, 85, 0.8);
-    --bg-overlay: rgba(15, 23, 42, 0.85);
+    /* Warna Hitam-Putih */
+    --bg-primary: #000000;
+    --bg-secondary: #1a1a1a;
+    --bg-card: rgba(26, 26, 26, 0.9);
     --text-primary: #ffffff;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --accent-blue: #3b82f6;
-    --accent-green: #22c55e;
-    --accent-red: #ef4444;
-    --accent-purple: #8b5cf6;
-    --accent-yellow: #f59e0b;
+    --text-secondary: #e0e0e0;
+    --text-muted: #888888;
+    --text-dark: #000000;
+    
+    /* Warna aksen dalam grayscale */
+    --accent-primary: #ffffff;
+    --accent-secondary: #cccccc;
+    --accent-tertiary: #888888;
+    --accent-success: #2fff00;
+    --accent-warning: #aaaaaa;
+    --accent-error: #666666;
+    
+    /* Border dan Shadow */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-light: rgba(255, 255, 255, 0.2);
     --border-radius: 16px;
-    --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
     --blur: blur(10px);
 }
 
+/* Body dengan background berdasarkan waktu */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     color: var(--text-primary);
@@ -33,7 +42,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Background Image */
+/* Background berdasarkan waktu - Versi Grayscale */
 body::before {
     content: '';
     position: fixed;
@@ -41,14 +50,46 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     z-index: -2;
+    transition: opacity 0.8s ease-in-out;
+    filter: grayscale(100%);
 }
 
+/* Default background (fallback) */
+body.time-day::before {
+    background-image: url('./img/bg-day.png');
+    opacity: 1;
+}
+
+/* Morning: 04:00 - 11:59 */
+body.time-morning::before {
+    background-image: url('./img/bg-morning.png');
+    opacity: 1;
+}
+
+/* Afternoon: 12:00 - 16:59 */
+body.time-afternoon::before {
+    background-image: url('./img/bg-day.png');
+    opacity: 1;
+}
+
+/* Evening: 17:00 - 19:59 */    
+body.time-evening::before {
+    background-image: url('./img/bg-evening.png');
+    opacity: 1;
+}
+
+/* Night: 20:00 - 03:59 */
+body.time-night::before {
+    background-image: url('./img/bg-night.png');
+    opacity: 1;
+}
+
+/* Overlay gelap untuk meningkatkan keterbacaan */
 body::after {
     content: '';
     position: fixed;
@@ -56,8 +97,17 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%);
     z-index: -1;
+    transition: background 0.8s ease-in-out;
+}
+
+/* Overlay hitam untuk semua waktu */
+body.time-day::after,
+body.time-afternoon::after,
+body.time-morning::after,
+body.time-evening::after,
+body.time-night::after {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%);
 }
 
 .container {
@@ -67,12 +117,29 @@ body::after {
     position: relative;
 }
 
-/* Glassmorphism Effect */
-.glass-effect {
-    background: rgba(30, 41, 59, 0.6);
-    backdrop-filter: var(--blur);
-    -webkit-backdrop-filter: var(--blur);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* Time Indicator */
+.time-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.time-indicator i {
+    font-size: 1rem;
+    color: var(--text-primary);
 }
 
 /* Header */
@@ -85,21 +152,22 @@ body::after {
     gap: 20px;
     padding: 20px;
     border-radius: var(--border-radius);
-    background: rgba(30, 41, 59, 0.7);
+    background: rgba(26, 26, 26, 0.9);
     backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
 }
 
 .header h1 {
     font-size: 1.8rem;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     display: flex;
     align-items: center;
     gap: 10px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .header-controls {
@@ -113,12 +181,14 @@ body::after {
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
-    background: rgba(30, 41, 59, 0.8);
+    background: rgba(26, 26, 26, 0.9);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--border-color);
     font-size: 0.9rem;
     font-weight: 600;
-    backdrop-filter: blur(5px);
+    color: var(--text-primary);
 }
 
 .status-dot {
@@ -129,18 +199,18 @@ body::after {
 }
 
 .status-indicator.online .status-dot {
-    background: var(--accent-green);
-    box-shadow: 0 0 10px var(--accent-green);
+    background: var(--accent-primary);
+    box-shadow: 0 0 10px var(--accent-primary);
     animation: pulse 2s infinite;
 }
 
 .status-indicator.offline .status-dot {
-    background: var(--accent-red);
+    background: var(--accent-error);
 }
 
 .status-indicator.ingame .status-dot {
-    background: var(--accent-purple);
-    box-shadow: 0 0 10px var(--accent-purple);
+    background: var(--accent-success);
+    box-shadow: 0 0 10px var(--accent-success);
     animation: pulse 1.5s infinite;
 }
 
@@ -157,8 +227,8 @@ body::after {
 
 /* Buttons */
 .btn-refresh {
-    background: linear-gradient(90deg, var(--accent-blue), #2563eb);
-    color: white;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    color: var(--text-dark);
     border: none;
     padding: 12px 24px;
     border-radius: 10px;
@@ -168,12 +238,12 @@ body::after {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .btn-refresh:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
 }
 
 .btn-refresh:active {
@@ -187,12 +257,13 @@ body::after {
 
 /* Profile Card */
 .profile-card {
-    background: rgba(30, 41, 59, 0.7);
+    background: rgba(26, 26, 26, 0.9);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: var(--border-radius);
     padding: 30px;
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--border-color);
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
@@ -205,7 +276,7 @@ body::after {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
 }
 
 .profile-header {
@@ -224,15 +295,17 @@ body::after {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.2);
+    border: 4px solid var(--border-light);
     object-fit: cover;
-    background: rgba(51, 65, 85, 0.5);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(40, 40, 40, 0.5);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease;
+    filter: grayscale(20%);
 }
 
 .avatar:hover {
     transform: scale(1.05);
+    filter: grayscale(0%);
 }
 
 .avatar-status {
@@ -242,29 +315,28 @@ body::after {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 3px solid rgba(30, 41, 59, 0.8);
+    border: 3px solid rgba(26, 26, 26, 0.8);
     background: var(--text-muted);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .avatar-status.online {
-    background: var(--accent-green);
-    box-shadow: 0 0 15px var(--accent-green);
+    background: var(--accent-primary);
+    box-shadow: 0 0 15px var(--accent-primary);
 }
 
 .avatar-status.ingame {
-    background: var(--accent-purple);
-    box-shadow: 0 0 15px var(--accent-purple);
+    background: var(--accent-success);
+    box-shadow: 0 0 15px var(--accent-success);
 }
 
 .profile-info h2 {
     font-size: 2.2rem;
     margin-bottom: 5px;
-    background: linear-gradient(90deg, #fff, var(--text-secondary));
+    background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .profile-info p {
@@ -285,7 +357,9 @@ body::after {
     font-size: 0.85rem;
     font-weight: 500;
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     transition: transform 0.3s ease;
+    color: var(--text-primary);
 }
 
 .badge:hover {
@@ -293,15 +367,13 @@ body::after {
 }
 
 .badge.country {
-    background: rgba(59, 130, 246, 0.25);
-    color: var(--accent-blue);
-    border: 1px solid rgba(59, 130, 246, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--border-light);
 }
 
 .badge.id {
-    background: rgba(148, 163, 184, 0.25);
-    color: var(--text-muted);
-    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: rgba(136, 136, 136, 0.15);
+    border: 1px solid rgba(136, 136, 136, 0.3);
 }
 
 /* Stats Grid */
@@ -313,21 +385,22 @@ body::after {
 }
 
 .stat-card {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--border-radius);
     padding: 20px;
     display: flex;
     align-items: center;
     gap: 15px;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--border-light);
     box-shadow: var(--shadow-lg);
 }
 
@@ -339,9 +412,10 @@ body::after {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: rgba(59, 130, 246, 0.15);
-    color: var(--accent-blue);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-primary);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .stat-content {
@@ -360,11 +434,10 @@ body::after {
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--text-primary);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .stat-value.green {
-    color: var(--accent-green);
+    color: var(--accent-success);
 }
 
 /* Features Grid */
@@ -376,11 +449,12 @@ body::after {
 }
 
 .feature-card {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--border-radius);
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -389,7 +463,7 @@ body::after {
 
 .feature-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--border-light);
     box-shadow: var(--shadow-lg);
 }
 
@@ -403,20 +477,16 @@ body::after {
 }
 
 .feature-card.playtime::before { 
-    background: linear-gradient(90deg, #3b82f6, #06b6d4);
-    box-shadow: 0 0 20px #3b82f6;
+    background: linear-gradient(90deg, #ffffff, #cccccc);
 }
 .feature-card.love::before { 
-    background: linear-gradient(90deg, #ef4444, #f97316);
-    box-shadow: 0 0 20px #ef4444;
+    background: linear-gradient(90deg, #dddddd, #aaaaaa);
 }
 .feature-card.donation::before { 
-    background: linear-gradient(90deg, #22c55e, #84cc16);
-    box-shadow: 0 0 20px #22c55e;
+    background: linear-gradient(90deg, #eeeeee, #bbbbbb);
 }
 .feature-card.gift::before { 
-    background: linear-gradient(90deg, #8b5cf6, #d946ef);
-    box-shadow: 0 0 20px #8b5cf6;
+    background: linear-gradient(90deg, #ffffff, #999999);
 }
 
 .feature-header {
@@ -435,26 +505,24 @@ body::after {
     justify-content: center;
     border-radius: 12px;
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: var(--text-primary);
 }
 
 .feature-card.playtime .feature-icon {
-    background: rgba(59, 130, 246, 0.15);
-    color: var(--accent-blue);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .feature-card.love .feature-icon {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--accent-red);
+    background: rgba(221, 221, 221, 0.1);
 }
 
 .feature-card.donation .feature-icon {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--accent-green);
+    background: rgba(238, 238, 238, 0.1);
 }
 
 .feature-card.gift .feature-icon {
-    background: rgba(139, 92, 246, 0.15);
-    color: var(--accent-purple);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .feature-title h3 {
@@ -476,16 +544,16 @@ body::after {
     font-weight: 900;
     color: var(--text-primary);
     line-height: 1;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Game Info */
 .game-info {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--border-radius);
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
 }
 
@@ -496,7 +564,6 @@ body::after {
     display: flex;
     align-items: center;
     gap: 10px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .game-details {
@@ -522,12 +589,11 @@ body::after {
     color: var(--text-primary);
     font-weight: 600;
     font-size: 1.1rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .btn-join {
-    background: linear-gradient(90deg, var(--accent-green), #16a34a);
-    color: white;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    color: var(--text-dark);
     padding: 14px 28px;
     border-radius: 10px;
     text-decoration: none;
@@ -536,21 +602,19 @@ body::after {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-    border: none;
-    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .btn-join:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
 }
 
 /* Footer */
 .footer {
     margin-top: 40px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-color);
     color: var(--text-muted);
 }
 
@@ -596,8 +660,8 @@ body::after {
 }
 
 .footer-link:hover {
-    color: var(--accent-blue);
-    background: rgba(59, 130, 246, 0.1);
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .footer-note {
@@ -605,21 +669,25 @@ body::after {
     font-size: 0.85rem;
     opacity: 0.7;
     padding: 10px;
-    background: rgba(15, 23, 42, 0.3);
+    background: rgba(0, 0, 0, 0.3);
     border-radius: var(--border-radius);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
 }
 
-.profile-card,
-.stats-grid,
-.features-grid,
-.game-info {
+.profile-card {
     animation: fadeIn 0.8s ease-out;
 }
 
@@ -629,6 +697,24 @@ body::after {
 
 .features-grid > * {
     animation: fadeIn 0.8s ease-out 0.2s both;
+}
+
+/* Scrollbar Custom */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* Responsive */
@@ -664,16 +750,26 @@ body::after {
     .game-details {
         flex-direction: column;
         align-items: stretch;
+        gap: 15px;
     }
     
     .btn-join {
         width: 100%;
         justify-content: center;
+        margin-top: 10px;
     }
     
     .footer-content {
         flex-direction: column;
         text-align: center;
+        gap: 15px;
+    }
+    
+    .time-indicator {
+        top: 10px;
+        right: 10px;
+        font-size: 0.75rem;
+        padding: 6px 12px;
     }
 }
 
@@ -703,22 +799,29 @@ body::after {
         padding: 10px 20px;
         font-size: 0.9rem;
     }
+    
+    .time-indicator {
+        display: none;
+    }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 10px;
+/* Selection Color */
+::selection {
+    background: rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
 }
 
-::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
+::-moz-selection {
+    background: rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
 }
 
-::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.5);
-    border-radius: 5px;
+/* Focus Outline */
+*:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
 }
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.8);
+.dashboard-title .icon {
+  width: 48px;
+  height: 48px;
 }
