@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vey X IDV</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="./img/idv.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-gamepad"></i> Roblox Profile Dashboard</h1>
+            <div class="header-controls">
+                <div class="status-indicator" id="statusIndicator">
+                    <div class="status-dot"></div>
+                    <span id="statusText">Checking...</span>
+                </div>
+                <button class="btn-refresh" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh Now
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Profile Card -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <img id="avatarImg" src="https://tr.rbxcdn.com/8348455289/420/420/AvatarHeadshot/Png" 
+                         alt="Avatar" class="avatar">
+                    <div class="avatar-status" id="avatarStatus"></div>
+                </div>
+                
+                <div class="profile-info">
+                    <h2 id="username">7VeyForDey h3h3h3</h2>
+                    <p id="displayName">@VeyH3H3H3H3</p>
+                    <div class="profile-badges">
+                        <span class="badge country">🇮🇩 Indonesia</span>
+                        <span class="badge id">ID: 8348455289</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-label">BEHAVIOR POINT</div>
+                        <div class="stat-value" id="behaviorPoint">100</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-tshirt"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-label">AVATAR WORTH</div>
+                        <div class="stat-value" id="avatarWorth">60</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-label">COLLECTOR POINT</div>
+                        <div class="stat-value" id="collectorPoint">170,145</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-label">LOYALTY POINT</div>
+                        <div class="stat-value" id="loyaltyPoint">78</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-fish"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-label">FISH CAUGHT</div>
+                        <div class="stat-value" id="fishCaught">3,492</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="features-grid">
+                <div class="feature-card playtime">
+                    <div class="feature-header">
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <div class="feature-title">
+                            <h3>Play Time</h3>
+                            <span class="feature-subtitle">Transcendent</span>
+                        </div>
+                    </div>
+                    <div class="feature-value" id="playtime">3885 h 24 m</div>
+                </div>
+
+                <div class="feature-card love">
+                    <div class="feature-header">
+                        <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                        <div class="feature-title">
+                            <h3>Love</h3>
+                            <span class="feature-subtitle">Megastar</span>
+                        </div>
+                    </div>
+                    <div class="feature-value" id="loveCount">28,107</div>
+                </div>
+
+                <div class="feature-card donation">
+                    <div class="feature-header">
+                        <div class="feature-icon"><i class="fas fa-gem"></i></div>
+                        <div class="feature-title">
+                            <h3>Donation</h3>
+                            <span class="feature-subtitle">Spark</span>
+                        </div>
+                    </div>
+                    <div class="feature-value" id="donationCount">100</div>
+                </div>
+
+                <div class="feature-card gift">
+                    <div class="feature-header">
+                        <div class="feature-icon"><i class="fas fa-gift"></i></div>
+                        <div class="feature-title">
+                            <h3>Gift</h3>
+                            <span class="feature-subtitle">Charitable</span>
+                        </div>
+                    </div>
+                    <div class="feature-value" id="giftCount">1,343</div>
+                </div>
+            </div>
+
+            <!-- Game Info Section -->
+            <div class="game-info" id="gameInfoSection" style="display: none;">
+                <h3><i class="fas fa-gamepad"></i> Currently Playing</h3>
+                <div class="game-details">
+                    <div class="game-item">
+                        <span class="game-label">Game:</span>
+                        <span class="game-value" id="currentGame">Indo Voice</span>
+                    </div>
+                    <div class="game-item">
+                        <span class="game-label">Status:</span>
+                        <span class="game-value" id="gameStatus">Online</span>
+                    </div>
+                    <a href="https://www.roblox.com/games/8356562067/Indo-Voice" 
+                       target="_blank" 
+                       class="btn-join" 
+                       id="joinButton">
+                        <i class="fas fa-play-circle"></i> Join Game
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="update-info">
+                    <i class="fas fa-history"></i>
+                    <span>Last updated: <span id="lastUpdate">--:--:--</span></span>
+                    <span class="separator">•</span>
+                    <span>Auto-refresh in: <span id="countdown">300</span>s</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://www.roblox.com/users/8348455289/profile" target="_blank" class="footer-link">
+                        <i class="fas fa-external-link-alt"></i> Roblox Profile
+                    </a>
+                    <button class="footer-link" id="copyUrlBtn">
+                        <i class="fas fa-copy"></i> Copy URL
+                    </button>
+                </div>
+            </div>
+            <p class="footer-note">Roblox Profile Dashboard • Auto-updates every 5 minutes</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
