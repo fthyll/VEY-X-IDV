@@ -15,8 +15,8 @@ const state = {
     lastStatus: null,
     lastRefreshTime: null,
     playtime: {
-        hours: 3885,
-        minutes: 30
+        hours: 3891,
+        minutes: 48
     },
     lastUserStatus: null, // 'offline', 'online', 'ingame'
     playtimeActive: false // Status apakah playtime sedang aktif bertambah
