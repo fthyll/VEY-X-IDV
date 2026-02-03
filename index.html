@@ -3,32 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vey X IDV</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Vey X IDV - Real Time Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./img/idv.png">
 </head>
 <body>
-    <!-- Time Indicator (akan dibuat oleh JavaScript) -->
-    
+    <!-- Time Indicator -->
+    <div class="time-indicator">
+        <i id="timeIcon">🌅</i>
+        <span id="timeText">Pagi 00:00</span>
+    </div>
+
+    <!-- Main Container -->
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1 class="dashboard-title">
-                <img src="./img/idv.png" alt="Dashboard" class="icon">Dashboard
-            </h1>
+            <div class="dashboard-title">
+                <img src="./img/idv.png" alt="Dashboard" class="icon">
+                <h1>Dashboard</h1>
+            </div>
+            
             <div class="header-controls">
                 <div class="status-indicator" id="statusIndicator">
                     <div class="status-dot"></div>
                     <span id="statusText">Checking...</span>
                 </div>
+                
+                <div class="playtime-controls">
+                    <button class="btn-control" id="pausePlaytimeBtn">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                </div>
+                
                 <button class="btn-refresh" id="refreshBtn">
                     <i class="fas fa-sync-alt"></i> Refresh Now
+                </button>
+                
+                <button class="btn-admin" id="adminLoginBtn">
+                    <i class="fas fa-user-shield"></i> Admin
                 </button>
             </div>
         </header>
 
-        <!-- Main Profile Card -->
+        <!-- Profile Card -->
         <div class="profile-card">
             <div class="profile-header">
                 <div class="avatar-container">
@@ -43,6 +61,44 @@
                     <div class="profile-badges">
                         <span class="badge country">🇮🇩 Indonesia</span>
                         <span class="badge id">ID: 8348455289</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Playtime Section -->
+            <div class="playtime-section">
+                <div class="playtime-header">
+                    <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                    <div class="feature-title">
+                        <h3>Real-Time Playtime</h3>
+                        <span class="feature-subtitle">Live Tracking</span>
+                    </div>
+                    <div class="playtime-status" id="playtimeStatus">Active</div>
+                </div>
+                
+                <div class="playtime-display">
+                    <div class="playtime-main">
+                        <div class="playtime-value" id="playtimeCounter">00:00:00</div>
+                        <div class="playtime-label">TOTAL PLAYTIME</div>
+                    </div>
+                    
+                    <div class="playtime-stats">
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeToday">00:00</div>
+                            <div class="stat-label">Today</div>
+                        </div>
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeWeek">00:00</div>
+                            <div class="stat-label">This Week</div>
+                        </div>
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeMonth">00:00</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeSessions">0</div>
+                            <div class="stat-label">Sessions</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -90,7 +146,7 @@
                 </div>
             </div>
 
-            <!-- Feature Cards -->
+            <!-- Features Grid -->
             <div class="features-grid">
                 <div class="feature-card playtime">
                     <div class="feature-header">
@@ -100,7 +156,7 @@
                             <span class="feature-subtitle">Transcendent</span>
                         </div>
                     </div>
-                    <div class="feature-value" id="playtime">3891 h 48 m</div>
+                    <div class="feature-value" id="totalPlaytime">3891 h 48 m</div>
                 </div>
 
                 <div class="feature-card love">
@@ -138,7 +194,7 @@
             </div>
 
             <!-- Game Info Section -->
-            <div class="game-info" id="gameInfoSection" style="display: none;">
+            <div class="game-info" id="gameInfoSection">
                 <h3><i class="fas fa-gamepad"></i> Currently Playing</h3>
                 <div class="game-details">
                     <div class="game-item">
@@ -164,21 +220,133 @@
             <div class="footer-content">
                 <div class="update-info">
                     <i class="fas fa-history"></i>
+                    <span>API: <span id="apiStatus">Checking...</span></span>
+                    <span class="separator">•</span>
                     <span>Last updated: <span id="lastUpdate">--:--:--</span></span>
                     <span class="separator">•</span>
-                    <span>Auto-refresh in: <span id="countdown">300</span>s</span>
+                    <span>Refresh in: <span id="countdown">30</span>s</span>
                 </div>
                 <div class="footer-links">
                     <a href="https://www.roblox.com/users/8348455289/profile" target="_blank" class="footer-link">
                         <i class="fas fa-external-link-alt"></i> Roblox Profile
+                    </a>
+                    <a href="https://vey.m-fatihyumna20.workers.dev" target="_blank" class="footer-link">
+                        <i class="fas fa-database"></i> API Source
                     </a>
                     <button class="footer-link" id="copyUrlBtn">
                         <i class="fas fa-copy"></i> Copy URL
                     </button>
                 </div>
             </div>
-            <p class="footer-note">Roblox Profile Dashboard • Auto-updates every 5 minutes</p>
+            <p class="footer-note">Real-Time Playtime Tracker • Data persists through refresh • Auto-updates every 30 seconds</p>
         </footer>
+    </div>
+
+    <!-- Admin Modal -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <!-- Login Section -->
+            <div class="login-section" id="loginSection">
+                <h3>Admin Login</h3>
+                <div class="error-message" id="loginError">Invalid credentials!</div>
+                <div class="form-group">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" placeholder="Enter admin username">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password">
+                </div>
+                <button class="btn-login" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+            
+            <!-- Admin Dashboard -->
+            <div class="admin-dashboard" id="adminDashboard" style="display: none;">
+                <div class="admin-section">
+                    <h3><i class="fas fa-cogs"></i> Playtime Controls</h3>
+                    <div class="control-grid">
+                        <div class="form-group">
+                            <label for="playtimeAdjustment">Adjustment (seconds)</label>
+                            <input type="number" id="playtimeAdjustment" placeholder="Enter seconds">
+                        </div>
+                        <div class="form-group">
+                            <label for="adjustmentType">Type</label>
+                            <select id="adjustmentType">
+                                <option value="add">Add Time</option>
+                                <option value="subtract">Subtract Time</option>
+                                <option value="set">Set Time</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-control" id="applyAdjustmentBtn">
+                        <i class="fas fa-check"></i> Apply Adjustment
+                    </button>
+                </div>
+                
+                <div class="admin-section">
+                    <h3><i class="fas fa-chart-bar"></i> System Statistics</h3>
+                    <div class="stats-grid-admin">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminTotalPlaytime">00:00:00</div>
+                            <div class="admin-stat-label">Total Playtime</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminSessionCount">0</div>
+                            <div class="admin-stat-label">Sessions</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminAvgSession">00:00</div>
+                            <div class="admin-stat-label">Avg Session</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminOnlineStatus">Offline</div>
+                            <div class="admin-stat-label">Current Status</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3><i class="fas fa-redo"></i> Data Management</h3>
+                    <p class="warning-text">Warning: These actions cannot be undone!</p>
+                    <div class="action-buttons">
+                        <button class="btn-action warning" id="resetTodayBtn">
+                            <i class="fas fa-calendar-day"></i> Reset Today
+                        </button>
+                        <button class="btn-action danger" id="resetAllBtn">
+                            <i class="fas fa-trash-alt"></i> Reset All
+                        </button>
+                        <button class="btn-action success" id="backupDataBtn">
+                            <i class="fas fa-save"></i> Backup Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3><i class="fas fa-info-circle"></i> System Info</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Version:</span>
+                            <span class="info-value">2.0.1 (Playtime Edition)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">LocalStorage:</span>
+                            <span class="info-value" id="storageStatus">Checking...</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Update:</span>
+                            <span class="info-value" id="lastSystemUpdate">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript -->
