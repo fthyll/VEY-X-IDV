@@ -9,9 +9,6 @@
     <link rel="icon" href="./img/idv.png">
 </head>
 <body>
-    <!-- Background based on time -->
-    <div class="background-overlay" id="backgroundOverlay"></div>
-    
     <!-- Time Indicator -->
     <div class="time-indicator">
         <i id="timeIcon">🌅</i>
@@ -68,15 +65,17 @@
                     <div class="feature-icon"><i class="fas fa-clock"></i></div>
                     <div class="feature-title">
                         <h3>Real-Time Playtime</h3>
-                        <span class="feature-subtitle">Live Tracking</span>
+                        <span class="feature-subtitle">Live Tracking • Auto-saves on refresh</span>
                     </div>
-                    <div class="playtime-status" id="playtimeStatus">Active</div>
+                    <div class="playtime-status" id="playtimeStatus">
+                        <i class="fas fa-circle"></i> <span id="playtimeStatusText">Active</span>
+                    </div>
                 </div>
                 
                 <div class="playtime-display">
                     <div class="playtime-main">
                         <div class="playtime-value" id="playtimeCounter">00:00:00</div>
-                        <div class="playtime-label">TOTAL PLAYTIME</div>
+                        <div class="playtime-label">TOTAL PLAYTIME (Persists through refresh)</div>
                     </div>
                     
                     <div class="playtime-stats">
@@ -221,7 +220,7 @@
                     <span class="separator">•</span>
                     <span>Last updated: <span id="lastUpdate">--:--:--</span></span>
                     <span class="separator">•</span>
-                    <span>Refresh in: <span id="countdown">30</span>s</span>
+                    <span>Auto-refresh: <span id="countdown">30</span>s</span>
                 </div>
                 <div class="footer-links">
                     <a href="https://www.roblox.com/users/8348455289/profile" target="_blank" class="footer-link">
@@ -330,7 +329,7 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Version:</span>
-                            <span class="info-value">2.0.1 (Playtime Edition)</span>
+                            <span class="info-value">2.1.0 (Auto-Playtime)</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">LocalStorage:</span>

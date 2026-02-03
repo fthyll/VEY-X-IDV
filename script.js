@@ -3,7 +3,7 @@ const CONFIG = {
     WORKER_URL: "https://vey.m-fatihyumna20.workers.dev",
     USER_ID: 8348455289,
     UPDATE_INTERVAL: 30000, // 30 detik
-    COUNTDOWN_START: 30,
+    COUNTDOWN_START: 30, // 30 detik
     AVATAR_URL: "https://tr.rbxcdn.com/8348455289/420/420/AvatarHeadshot/Png",
     
     // Admin credentials
@@ -13,23 +13,24 @@ const CONFIG = {
 
 // STATE MANAGEMENT
 const state = {
+    // User status
     countdown: CONFIG.COUNTDOWN_START,
     countdownInterval: null,
     isRefreshing: false,
     lastStatus: null,
     lastRefreshTime: null,
     
+    // Playtime system
     playtimeData: null,
     playtimeInterval: null,
+    lastUserStatus: null,
     
+    // Admin
     isAdminLoggedIn: false
 };
 
 // DOM ELEMENTS
 const elements = {
-    // Background
-    backgroundOverlay: document.getElementById('backgroundOverlay'),
-    
     // Time indicator
     timeIcon: document.getElementById('timeIcon'),
     timeText: document.getElementById('timeText'),
@@ -52,6 +53,7 @@ const elements = {
     playtimeMonth: document.getElementById('playtimeMonth'),
     playtimeSessions: document.getElementById('playtimeSessions'),
     playtimeStatus: document.getElementById('playtimeStatus'),
+    playtimeStatusText: document.getElementById('playtimeStatusText'),
     
     // Stats
     behaviorPoint: document.getElementById('behaviorPoint'),
@@ -134,61 +136,39 @@ function formatTimeFromSeconds(totalSeconds) {
 function formatShortTimeFromSeconds(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
     
     if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        return `${hours}:${minutes.toString().padStart(2, '0')}`;
     }
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, '0')}`;
 }
 
-// TIME-BASED BACKGROUND SYSTEM
-function setTimeBasedBackground() {
+// TIME-BASED INDICATOR
+function setTimeBasedIndicator() {
     const hour = new Date().getHours();
     const minutes = new Date().getMinutes().toString().padStart(2, '0');
     
     let timeText = '';
     let timeIcon = '';
-    let timeClass = '';
     
     if (hour >= 4 && hour < 12) {
-        // Morning: 04:00 - 11:59
         timeText = `Pagi ${hour}:${minutes}`;
         timeIcon = '🌅';
-        timeClass = 'morning';
-        
-        // Set body gradient
-        document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        
+        document.body.className = 'time-morning';
     } else if (hour >= 12 && hour < 17) {
-        // Afternoon: 12:00 - 16:59
         timeText = `Siang ${hour}:${minutes}`;
         timeIcon = '☀️';
-        timeClass = 'afternoon';
-        
-        document.body.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
-        
+        document.body.className = 'time-afternoon';
     } else if (hour >= 17 && hour < 20) {
-        // Evening: 17:00 - 19:59
         timeText = `Sore ${hour}:${minutes}`;
         timeIcon = '🌇';
-        timeClass = 'evening';
-        
-        document.body.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
-        
+        document.body.className = 'time-evening';
     } else {
-        // Night: 20:00 - 03:59
         timeText = `Malam ${hour}:${minutes}`;
         timeIcon = '🌙';
-        timeClass = 'night';
-        
-        document.body.style.background = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
+        document.body.className = 'time-night';
     }
     
-    // Update body class
-    document.body.className = timeClass;
-    
-    // Update time indicator
     elements.timeIcon.textContent = timeIcon;
     elements.timeText.textContent = timeText;
 }
@@ -199,54 +179,73 @@ function loadPlaytimeData() {
     const currentDate = new Date();
     const today = currentDate.toDateString();
     
-    // Calculate first day of week (Monday)
-    const day = currentDate.getDay();
-    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1);
-    const firstDayOfWeek = new Date(currentDate.setDate(diff)).toDateString();
+    // Calculate first day of week (Sunday)
+    const firstDayOfWeek = new Date(currentDate);
+    firstDayOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    const weekStart = firstDayOfWeek.toDateString();
     
-    // Reset to original date
-    currentDate.setDate(diff);
+    // Calculate first day of month
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toDateString();
     
     if (savedData) {
-        state.playtimeData = JSON.parse(savedData);
-        
-        // Reset daily data if day changed
-        if (state.playtimeData.todayDate !== today) {
-            state.playtimeData.todaySeconds = 0;
-            state.playtimeData.todayDate = today;
-        }
-        
-        // Reset weekly data if week changed
-        if (state.playtimeData.weekStartDate !== firstDayOfWeek) {
-            state.playtimeData.weekSeconds = 0;
-            state.playtimeData.weekStartDate = firstDayOfWeek;
-        }
-        
-        // Reset monthly data if month changed
-        if (state.playtimeData.monthStartDate !== firstDayOfMonth) {
-            state.playtimeData.monthSeconds = 0;
-            state.playtimeData.monthStartDate = firstDayOfMonth;
+        try {
+            state.playtimeData = JSON.parse(savedData);
+            
+            // Reset daily data if day changed
+            if (state.playtimeData.todayDate !== today) {
+                state.playtimeData.todaySeconds = 0;
+                state.playtimeData.todayDate = today;
+            }
+            
+            // Reset weekly data if week changed
+            if (state.playtimeData.weekStartDate !== weekStart) {
+                state.playtimeData.weekSeconds = 0;
+                state.playtimeData.weekStartDate = weekStart;
+            }
+            
+            // Reset monthly data if month changed
+            if (state.playtimeData.monthStartDate !== firstDayOfMonth) {
+                state.playtimeData.monthSeconds = 0;
+                state.playtimeData.monthStartDate = firstDayOfMonth;
+            }
+            
+            console.log('Playtime data loaded from localStorage');
+            
+        } catch (error) {
+            console.error('Error parsing playtime data:', error);
+            initializeNewPlaytimeData();
         }
     } else {
-        // Initialize new data
-        state.playtimeData = {
-            totalSeconds: 3891 * 3600 + 48 * 60, // Convert existing playtime to seconds
-            todaySeconds: 0,
-            weekSeconds: 0,
-            monthSeconds: 0,
-            sessions: 0,
-            lastUpdated: new Date().toISOString(),
-            todayDate: today,
-            weekStartDate: firstDayOfWeek,
-            monthStartDate: firstDayOfMonth,
-            isOnline: false,
-            lastStatusChange: null
-        };
+        initializeNewPlaytimeData();
     }
     
     updatePlaytimeDisplay();
-    console.log('Playtime data loaded from localStorage');
+}
+
+function initializeNewPlaytimeData() {
+    const currentDate = new Date();
+    const today = currentDate.toDateString();
+    const firstDayOfWeek = new Date(currentDate);
+    firstDayOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    const weekStart = firstDayOfWeek.toDateString();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toDateString();
+    
+    // Initialize new data
+    state.playtimeData = {
+        totalSeconds: 3891 * 3600 + 48 * 60, // Convert existing playtime to seconds
+        todaySeconds: 0,
+        weekSeconds: 0,
+        monthSeconds: 0,
+        sessions: 0,
+        lastUpdated: new Date().toISOString(),
+        todayDate: today,
+        weekStartDate: weekStart,
+        monthStartDate: firstDayOfMonth,
+        isOnline: false,
+        lastStatusChange: null
+    };
+    
+    console.log('New playtime data initialized');
 }
 
 function savePlaytimeData() {
@@ -284,7 +283,7 @@ function startPlaytimeCounter() {
     
     state.playtimeInterval = setInterval(() => {
         if (state.playtimeData && state.playtimeData.isOnline) {
-            // Playtime only increases when user is online
+            // Increment playtime only when user is online
             state.playtimeData.totalSeconds++;
             state.playtimeData.todaySeconds++;
             state.playtimeData.weekSeconds++;
@@ -292,12 +291,49 @@ function startPlaytimeCounter() {
             
             updatePlaytimeDisplay();
             
-            // Auto-save every 10 seconds
-            if (state.playtimeData.totalSeconds % 10 === 0) {
+            // Auto-save every 30 seconds
+            if (state.playtimeData.totalSeconds % 30 === 0) {
                 savePlaytimeData();
             }
         }
     }, 1000);
+}
+
+// UPDATE PLAYER STATUS
+function updatePlayerStatus(isOnline) {
+    if (!state.playtimeData) return;
+    
+    const wasOnline = state.playtimeData.isOnline;
+    state.playtimeData.isOnline = isOnline;
+    
+    if (isOnline && !wasOnline) {
+        // User just came online - start new session
+        state.playtimeData.sessions++;
+        state.playtimeData.lastStatusChange = new Date().toISOString();
+        
+        // Update playtime status display
+        elements.playtimeStatusText.textContent = 'Active';
+        elements.playtimeStatus.style.background = 'rgba(0, 255, 136, 0.15)';
+        elements.playtimeStatus.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+        elements.playtimeStatus.style.color = 'var(--accent-success)';
+        
+        console.log('Playtime started - user is online');
+        
+    } else if (!isOnline && wasOnline) {
+        // User just went offline
+        state.playtimeData.lastStatusChange = new Date().toISOString();
+        
+        // Update playtime status display
+        elements.playtimeStatusText.textContent = 'Paused';
+        elements.playtimeStatus.style.background = 'rgba(255, 68, 68, 0.15)';
+        elements.playtimeStatus.style.borderColor = 'rgba(255, 68, 68, 0.3)';
+        elements.playtimeStatus.style.color = 'var(--accent-error)';
+        
+        // Save data when user goes offline
+        savePlaytimeData();
+        
+        console.log('Playtime paused - user is offline');
+    }
 }
 
 // COUNTDOWN TIMER
@@ -334,14 +370,14 @@ function updateStatusUI(data) {
     const isInGame = presenceType === 2;
     const isInIndoVoice = data.isInIndoVoice || false;
     
-    // Save previous status
-    const previousStatus = state.playtimeData ? state.playtimeData.isOnline : false;
-    
     // Update API status
     elements.apiStatus.textContent = "Online";
     elements.apiStatus.style.color = "var(--accent-success)";
     
-    // Update status indicator
+    // Update player status (this controls playtime)
+    updatePlayerStatus(isOnline);
+    
+    // Update visual status indicators
     if (!isOnline) {
         // OFFLINE
         elements.statusIndicator.className = 'status-indicator offline';
@@ -349,16 +385,8 @@ function updateStatusUI(data) {
         elements.avatarStatus.className = '';
         elements.avatarStatus.classList.remove('online', 'ingame');
         
-        // Update playtime status (automatically paused when offline)
-        elements.playtimeStatus.textContent = 'Paused';
-        elements.playtimeStatus.style.backgroundColor = 'rgba(255, 100, 100, 0.2)';
-        elements.playtimeStatus.style.borderColor = 'var(--accent-error)';
-        elements.playtimeStatus.style.color = 'var(--accent-error)';
-        
         // Hide game info
         elements.gameInfoSection.style.display = 'none';
-        
-        console.log('Status: OFFLINE - Playtime paused automatically');
         
     } else if (isInIndoVoice) {
         // IN INDO VOICE
@@ -366,19 +394,11 @@ function updateStatusUI(data) {
         elements.statusText.textContent = 'INDO VOICE';
         elements.avatarStatus.className = 'avatar-status ingame';
         
-        // Update playtime status (active when online)
-        elements.playtimeStatus.textContent = 'Active';
-        elements.playtimeStatus.style.backgroundColor = 'rgba(100, 255, 100, 0.2)';
-        elements.playtimeStatus.style.borderColor = 'var(--accent-success)';
-        elements.playtimeStatus.style.color = 'var(--accent-success)';
-        
         // Show game info
         elements.gameInfoSection.style.display = 'block';
         elements.currentGame.textContent = 'Indo Voice';
         elements.gameStatus.textContent = 'Online';
         elements.joinButton.style.display = 'inline-flex';
-        
-        console.log('Status: IN INDO VOICE - Playtime active');
         
     } else if (isInGame) {
         // IN OTHER GAME
@@ -386,19 +406,11 @@ function updateStatusUI(data) {
         elements.statusText.textContent = 'IN GAME';
         elements.avatarStatus.className = 'avatar-status ingame';
         
-        // Update playtime status (active when online)
-        elements.playtimeStatus.textContent = 'Active';
-        elements.playtimeStatus.style.backgroundColor = 'rgba(100, 255, 100, 0.2)';
-        elements.playtimeStatus.style.borderColor = 'var(--accent-success)';
-        elements.playtimeStatus.style.color = 'var(--accent-success)';
-        
         // Show game info
         elements.gameInfoSection.style.display = 'block';
         elements.currentGame.textContent = data.lastLocation || 'Playing a game';
         elements.gameStatus.textContent = 'Online';
         elements.joinButton.style.display = 'none';
-        
-        console.log('Status: IN GAME - Playtime active');
         
     } else {
         // ONLINE (not in game)
@@ -406,28 +418,8 @@ function updateStatusUI(data) {
         elements.statusText.textContent = 'ONLINE';
         elements.avatarStatus.className = 'avatar-status online';
         
-        // Update playtime status (active when online)
-        elements.playtimeStatus.textContent = 'Active';
-        elements.playtimeStatus.style.backgroundColor = 'rgba(100, 255, 100, 0.2)';
-        elements.playtimeStatus.style.borderColor = 'var(--accent-success)';
-        elements.playtimeStatus.style.color = 'var(--accent-success)';
-        
         // Hide game info
         elements.gameInfoSection.style.display = 'none';
-        
-        console.log('Status: ONLINE - Playtime active');
-    }
-    
-    // Update playtime data
-    if (state.playtimeData) {
-        // Check if status changed from offline to online
-        if (!previousStatus && isOnline) {
-            state.playtimeData.sessions++;
-            console.log('New play session started');
-        }
-        
-        // Update online status
-        state.playtimeData.isOnline = isOnline;
     }
     
     // Update username if available
@@ -441,12 +433,14 @@ function updateStatusUI(data) {
     
     // Update avatar with timestamp to avoid cache
     if (data.avatarUrl) {
-        elements.avatarImg.src = data.avatarUrl + '?t=' + new Date().getTime();
+        const timestamp = new Date().getTime();
+        elements.avatarImg.src = data.avatarUrl + '?t=' + timestamp;
     }
     
     // Handle avatar error
     elements.avatarImg.onerror = function() {
-        this.src = CONFIG.AVATAR_URL + '?t=' + new Date().getTime();
+        const timestamp = new Date().getTime();
+        this.src = CONFIG.AVATAR_URL + '?t=' + timestamp;
     };
 }
 
@@ -472,11 +466,11 @@ async function fetchRobloxData() {
             throw new Error(data.error || 'API returned error');
         }
         
-        console.log('Data fetched successfully:', data);
+        console.log('API data fetched successfully');
         return data;
         
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching API data:', error);
         
         // Update API status
         elements.apiStatus.textContent = "Offline";
@@ -513,7 +507,10 @@ async function refreshData() {
         updateLastUpdateTime();
         
         console.log('Data refreshed successfully');
-        console.log(`Current playtime: ${formatTimeFromSeconds(state.playtimeData.totalSeconds)}`);
+        if (state.playtimeData) {
+            console.log(`Current playtime: ${formatTimeFromSeconds(state.playtimeData.totalSeconds)}`);
+            console.log(`Status: ${state.playtimeData.isOnline ? 'Online (Playtime Active)' : 'Offline (Playtime Paused)'}`);
+        }
         
     } catch (error) {
         console.error('Refresh failed:', error);
@@ -544,7 +541,8 @@ function initializeStats() {
     elements.giftCount.textContent = formatNumber(1343);
     
     // Set avatar with timestamp to avoid cache
-    elements.avatarImg.src = CONFIG.AVATAR_URL + '?t=' + new Date().getTime();
+    const timestamp = new Date().getTime();
+    elements.avatarImg.src = CONFIG.AVATAR_URL + '?t=' + timestamp;
     
     console.log('Stats initialized');
 }
@@ -566,7 +564,8 @@ function updateAdminDashboard() {
         "var(--accent-success)" : "var(--accent-error)";
     
     // Update system info
-    elements.storageStatus.textContent = "Active (" + (JSON.stringify(state.playtimeData).length / 1024).toFixed(2) + " KB)";
+    const dataSize = JSON.stringify(state.playtimeData).length / 1024;
+    elements.storageStatus.textContent = `Active (${dataSize.toFixed(2)} KB)`;
     elements.lastSystemUpdate.textContent = formatTime(new Date(state.playtimeData.lastUpdated));
 }
 
@@ -658,6 +657,7 @@ function setupEventListeners() {
         }
         
         if (confirm(confirmMessage)) {
+            // Calculate difference for updating stats
             const diff = newTotalSeconds - state.playtimeData.totalSeconds;
             
             state.playtimeData.totalSeconds = newTotalSeconds;
@@ -688,25 +688,20 @@ function setupEventListeners() {
         if (confirm("Reset ALL playtime data? This action cannot be undone.")) {
             const currentDate = new Date();
             const today = currentDate.toDateString();
-            
-            // Calculate first day of week (Monday)
-            const day = currentDate.getDay();
-            const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1);
-            const firstDayOfWeek = new Date(currentDate.setDate(diff)).toDateString();
-            
-            // Reset to original date
-            currentDate.setDate(diff);
+            const firstDayOfWeek = new Date(currentDate);
+            firstDayOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+            const weekStart = firstDayOfWeek.toDateString();
             const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toDateString();
             
             state.playtimeData = {
-                totalSeconds: 0,
+                totalSeconds: 3891 * 3600 + 48 * 60, // Keep original total
                 todaySeconds: 0,
                 weekSeconds: 0,
                 monthSeconds: 0,
                 sessions: 0,
                 lastUpdated: new Date().toISOString(),
                 todayDate: today,
-                weekStartDate: firstDayOfWeek,
+                weekStartDate: weekStart,
                 monthStartDate: firstDayOfMonth,
                 isOnline: false,
                 lastStatusChange: null
@@ -714,7 +709,7 @@ function setupEventListeners() {
             
             updatePlaytimeDisplay();
             savePlaytimeData();
-            alert("All playtime data has been reset!");
+            alert("All playtime data has been reset (except total)!");
         }
     });
     
@@ -735,7 +730,7 @@ function setupEventListeners() {
     
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey) {
+        if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.altKey) {
             refreshData();
         }
         if (e.key === 'Escape' && elements.adminModal.classList.contains('active')) {
@@ -749,8 +744,13 @@ function setupEventListeners() {
         if (!document.hidden) {
             console.log('Page became visible, refreshing...');
             refreshData();
-        } else {
-            console.log('Page hidden');
+        }
+    });
+    
+    // Save data before page unload
+    window.addEventListener('beforeunload', () => {
+        if (state.playtimeData) {
+            savePlaytimeData();
         }
     });
     
@@ -765,11 +765,11 @@ function setupEventListeners() {
 
 // INITIALIZATION
 async function initialize() {
-    console.log('Initializing Real-Time Playtime Tracker...');
+    console.log('Initializing Vey Dashboard with Auto-Playtime System...');
     
-    // Setup time-based background
-    setTimeBasedBackground();
-    setInterval(setTimeBasedBackground, 60000);
+    // Setup time indicator
+    setTimeBasedIndicator();
+    setInterval(setTimeBasedIndicator, 60000); // Update every minute
     
     // Load playtime data
     loadPlaytimeData();
@@ -790,7 +790,7 @@ async function initialize() {
     startCountdown();
     
     console.log('Dashboard initialized successfully!');
-    console.log('Playtime system active - automatically pauses when offline');
+    console.log('Playtime system: Auto-pauses when offline, auto-resumes when online');
     console.log('Admin login: username="admin", password="admin123"');
 }
 
