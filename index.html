@@ -9,6 +9,9 @@
     <link rel="icon" href="./img/idv.png">
 </head>
 <body>
+    <!-- Background based on time -->
+    <div class="background-overlay" id="backgroundOverlay"></div>
+    
     <!-- Time Indicator -->
     <div class="time-indicator">
         <i id="timeIcon">🌅</i>
@@ -28,12 +31,6 @@
                 <div class="status-indicator" id="statusIndicator">
                     <div class="status-dot"></div>
                     <span id="statusText">Checking...</span>
-                </div>
-                
-                <div class="playtime-controls">
-                    <button class="btn-control" id="pausePlaytimeBtn">
-                        <i class="fas fa-pause"></i> Pause
-                    </button>
                 </div>
                 
                 <button class="btn-refresh" id="refreshBtn">
