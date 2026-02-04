@@ -24,7 +24,7 @@
     --accent-success: #00ff88;
     --accent-warning: #ffaa00;
     --accent-error: #ff4444;
-    --accent-info: #00a8ff;
+    --accent-info: #53ff6a;
     
     /* Border dan Shadow */
     --border-color: rgba(255, 255, 255, 0.15);
@@ -66,25 +66,25 @@ body::before {
 /* Default Background Images untuk Setiap Waktu */
 body.time-morning::before {
     background-image: linear-gradient(rgba(255, 200, 100, 0.1), rgba(100, 150, 255, 0.1)), 
-                      url('https://images.unsplash.com/photo-1498496294664-d9372eb521f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+                      url('./img/bg-morning.png');
     filter: brightness(1.1);
 }
 
 body.time-afternoon::before {
     background-image: linear-gradient(rgba(255, 220, 120, 0.1), rgba(80, 140, 240, 0.1)), 
-                      url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+                      url('./img/bg-afternoon.png');
     filter: brightness(1.05);
 }
 
 body.time-evening::before {
     background-image: linear-gradient(rgba(255, 100, 100, 0.1), rgba(50, 50, 150, 0.1)), 
-                      url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+                      url('./img/bg-evening.png');
     filter: brightness(0.9);
 }
 
 body.time-night::before {
     background-image: linear-gradient(rgba(0, 0, 50, 0.1), rgba(0, 0, 20, 0.1)), 
-                      url('https://images.unsplash.com/photo-1534796636918-6a8c0be14515?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+                      url('./img/bg-night.png');
     filter: brightness(0.8);
 }
 

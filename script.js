@@ -8,7 +8,7 @@ const CONFIG = {
     
     // Admin credentials
     ADMIN_USERNAME: "admin",
-    ADMIN_PASSWORD: "admin123"
+    ADMIN_PASSWORD: "VeyH3H3H3H3"
 };
 
 // STATE MANAGEMENT
@@ -536,8 +536,8 @@ async function refreshData() {
 function initializeStats() {
     // Format numbers with commas
     elements.collectorPoint.textContent = formatNumber(170145);
-    elements.fishCaught.textContent = formatNumber(3492);
-    elements.loveCount.textContent = formatNumber(28110);
+    elements.fishCaught.textContent = formatNumber(3584);
+    elements.loveCount.textContent = formatNumber(28567);
     elements.giftCount.textContent = formatNumber(1343);
     
     // Set avatar with timestamp to avoid cache
