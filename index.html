@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vey X IDV - Real Time Tracker</title>
+    <title>Vey X IDV - Real Time Tracker (Synced)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./img/idv.png">
@@ -13,6 +13,9 @@
     <div class="time-indicator">
         <i id="timeIcon">🌅</i>
         <span id="timeText">Pagi 00:00</span>
+        <div class="sync-status" id="syncStatusIndicator">
+            <i class="fas fa-circle"></i> <span id="syncStatusText">Sync</span>
+        </div>
     </div>
 
     <!-- Main Container -->
@@ -22,6 +25,11 @@
             <div class="dashboard-title">
                 <img src="./img/idv.png" alt="Dashboard" class="icon">
                 <h1>Dashboard</h1>
+                <div class="tier-indicator" id="headerTier">
+                    <i class="fas fa-trophy"></i>
+                    <span id="headerTierName">Stranger</span>
+                </div>
+                <span class="version-badge">v3.0 • Full System</span>
             </div>
             
             <div class="header-controls">
@@ -55,9 +63,100 @@
                     <div class="profile-badges">
                         <span class="badge country">🇮🇩 Indonesia</span>
                         <span class="badge id">ID: 8348455289</span>
+                        <span class="badge sync-badge" id="deviceIdBadge">
+                            <i class="fas fa-mobile-alt"></i> Device: <span id="deviceIdDisplay">Loading...</span>
+                        </span>
                     </div>
                 </div>
             </div>
+
+            <!-- Real-time Playtime Section -->
+            <div class="playtime-section">
+                <div class="playtime-header">
+                    <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                    <div class="feature-title">
+                        <h3>Synced Playtime System</h3>
+                        <span class="feature-subtitle">Cloud-Synced • Multi-Device</span>
+                    </div>
+                    <div class="playtime-status" id="playtimeStatus">
+                        <i class="fas fa-circle"></i> 
+                        <span id="playtimeStatusText">Syncing...</span>
+                    </div>
+                </div>
+                
+                <div class="playtime-display">
+                    <div class="playtime-main">
+                        <div class="playtime-value" id="playtimeCounter">00:00:00</div>
+                        <div class="playtime-label">SYNCED PLAYTIME (All Devices)</div>
+                    </div>
+                    
+                    <div class="playtime-stats">
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeToday">00:00</div>
+                            <div class="stat-label">Today</div>
+                        </div>
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeWeek">00:00</div>
+                            <div class="stat-label">This Week</div>
+                        </div>
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeMonth">00:00</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                        <div class="playtime-stat">
+                            <div class="stat-value" id="playtimeSessions">0</div>
+                            <div class="stat-label">Sessions</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sync-info">
+                    <div class="sync-item">
+                        <i class="fas fa-server"></i>
+                        <span>Last Sync: <span id="lastSyncTime">Never</span></span>
+                    </div>
+                    <div class="sync-item">
+                        <i class="fas fa-database"></i>
+                        <span>Devices: <span id="syncedDevicesCount">0</span> connected</span>
+                    </div>
+                    <button class="btn-sync" id="manualSyncBtn">
+                        <i class="fas fa-sync-alt"></i> Sync Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tier Playtime Section -->
+            <div class="tier-section">
+                <div class="tier-header">
+                    <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="feature-title">
+                        <h3>Playtime Tiers</h3>
+                        <span class="feature-subtitle">Progress & Rewards</span>
+                    </div>
+                    <div class="tier-current" id="currentTier">
+                        <i class="fas fa-crown"></i> <span id="currentTierName">Stranger</span>
+                    </div>
+                </div>
+                
+                <div class="tier-progress">
+                    <div class="progress-header">
+                        <div class="progress-label">Current Progress</div>
+                        <div class="progress-percentage" id="tierProgress">0%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="tierProgressBar"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span id="currentHours">0 hours</span>
+                        <span id="nextTierHours">1 hour to next tier</span>
+                    </div>
+                </div>
+                
+                <div class="tiers-grid" id="tiersGrid">
+                    <!-- Tiers akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+
             <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
@@ -88,7 +187,7 @@
                     <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
                     <div class="stat-content">
                         <div class="stat-label">LOYALTY POINT</div>
-                        <div class="stat-value" id="loyaltyPoint">84</div>
+                        <div class="stat-value" id="loyaltyPoint">78</div>
                     </div>
                 </div>
 
@@ -96,7 +195,7 @@
                     <div class="stat-icon"><i class="fas fa-fish"></i></div>
                     <div class="stat-content">
                         <div class="stat-label">FISH CAUGHT</div>
-                        <div class="stat-value" id="fishCaught">3,584</div>
+                        <div class="stat-value" id="fishCaught">3,492</div>
                     </div>
                 </div>
             </div>
@@ -122,7 +221,7 @@
                             <span class="feature-subtitle">Megastar</span>
                         </div>
                     </div>
-                    <div class="feature-value" id="loveCount">28,567</div>
+                    <div class="feature-value" id="loveCount">28,110</div>
                 </div>
 
                 <div class="feature-card donation">
@@ -169,45 +268,6 @@
                 </div>
             </div>
         </div>
-            <!-- Real-time Playtime Section -->
-            <div class="playtime-section">
-                <div class="playtime-header">
-                    <div class="feature-icon"><i class="fas fa-clock"></i></div>
-                    <div class="feature-title">
-                        <h3>Real-Time Playtime</h3>
-                        <span class="feature-subtitle">Live Tracking • Auto-saves on refresh</span>
-                    </div>
-                    <div class="playtime-status" id="playtimeStatus">
-                        <i class="fas fa-circle"></i> <span id="playtimeStatusText">Active</span>
-                    </div>
-                </div>
-                
-                <div class="playtime-display">
-                    <div class="playtime-main">
-                        <div class="playtime-value" id="playtimeCounter">00:00:00</div>
-                        <div class="playtime-label">TOTAL PLAYTIME (Persists through refresh)</div>
-                    </div>
-                    
-                    <div class="playtime-stats">
-                        <div class="playtime-stat">
-                            <div class="stat-value" id="playtimeToday">00:00</div>
-                            <div class="stat-label">Today</div>
-                        </div>
-                        <div class="playtime-stat">
-                            <div class="stat-value" id="playtimeWeek">00:00</div>
-                            <div class="stat-label">This Week</div>
-                        </div>
-                        <div class="playtime-stat">
-                            <div class="stat-value" id="playtimeMonth">00:00</div>
-                            <div class="stat-label">This Month</div>
-                        </div>
-                        <div class="playtime-stat">
-                            <div class="stat-value" id="playtimeSessions">0</div>
-                            <div class="stat-label">Sessions</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         <!-- Footer -->
         <footer class="footer">
@@ -218,7 +278,7 @@
                     <span class="separator">•</span>
                     <span>Last updated: <span id="lastUpdate">--:--:--</span></span>
                     <span class="separator">•</span>
-                    <span>Auto-refresh: <span id="countdown">30</span>s</span>
+                    <span>Sync: <span id="countdown">30</span>s</span>
                 </div>
                 <div class="footer-links">
                     <a href="https://www.roblox.com/users/8348455289/profile" target="_blank" class="footer-link">
@@ -230,9 +290,12 @@
                     <button class="footer-link" id="copyUrlBtn">
                         <i class="fas fa-copy"></i> Copy URL
                     </button>
+                    <button class="footer-link" id="deviceInfoBtn">
+                        <i class="fas fa-info-circle"></i> Device Info
+                    </button>
                 </div>
             </div>
-            <p class="footer-note">Real-Time Playtime Tracker • Data persists through refresh • Auto-updates every 30 seconds</p>
+            <p class="footer-note">Synced Playtime System • Multi-Device Support • Auto-Sync every 30 seconds</p>
         </footer>
     </div>
 
@@ -263,6 +326,139 @@
             
             <!-- Admin Dashboard -->
             <div class="admin-dashboard" id="adminDashboard" style="display: none;">
+                <!-- Tier Statistics -->
+                <div class="admin-section">
+                    <h3><i class="fas fa-trophy"></i> Tier Statistics</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Current Tier:</span>
+                            <span class="info-value" id="adminCurrentTier">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Hours Played:</span>
+                            <span class="info-value" id="adminTotalHours">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Next Tier:</span>
+                            <span class="info-value" id="adminNextTier">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Progress:</span>
+                            <span class="info-value" id="adminTierProgress">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Statistics Section -->
+                <div class="admin-section">
+                    <h3><i class="fas fa-edit"></i> Edit Statistics</h3>
+                    <div class="edit-stats-grid">
+                        <!-- Avatar Worth -->
+                        <div class="form-group">
+                            <label for="editAvatarWorth">AVATAR WORTH</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editAvatarWorth" placeholder="Current: 60" min="0" max="999999">
+                                <button class="btn-edit-stat" data-stat="avatarWorth" data-current="60">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Collector Point -->
+                        <div class="form-group">
+                            <label for="editCollectorPoint">COLLECTOR POINT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editCollectorPoint" placeholder="Current: 170,145" min="0" max="999999999">
+                                <button class="btn-edit-stat" data-stat="collectorPoint" data-current="170145">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loyalty Point -->
+                        <div class="form-group">
+                            <label for="editLoyaltyPoint">LOYALTY POINT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editLoyaltyPoint" placeholder="Current: 78" min="0" max="999999">
+                                <button class="btn-edit-stat" data-stat="loyaltyPoint" data-current="78">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Fish Caught -->
+                        <div class="form-group">
+                            <label for="editFishCaught">FISH CAUGHT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editFishCaught" placeholder="Current: 3,492" min="0" max="999999999">
+                                <button class="btn-edit-stat" data-stat="fishCaught" data-current="3492">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Love Count -->
+                        <div class="form-group">
+                            <label for="editLoveCount">LOVE COUNT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editLoveCount" placeholder="Current: 28,110" min="0" max="999999999">
+                                <button class="btn-edit-stat" data-stat="loveCount" data-current="28110">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Donation Count -->
+                        <div class="form-group">
+                            <label for="editDonationCount">DONATION COUNT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editDonationCount" placeholder="Current: 100" min="0" max="999999999">
+                                <button class="btn-edit-stat" data-stat="donationCount" data-current="100">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gift Count -->
+                        <div class="form-group">
+                            <label for="editGiftCount">GIFT COUNT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editGiftCount" placeholder="Current: 1,343" min="0" max="999999999">
+                                <button class="btn-edit-stat" data-stat="giftCount" data-current="1343">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Behavior Point -->
+                        <div class="form-group">
+                            <label for="editBehaviorPoint">BEHAVIOR POINT</label>
+                            <div class="input-with-button">
+                                <input type="number" id="editBehaviorPoint" placeholder="Current: 100" min="0" max="999999">
+                                <button class="btn-edit-stat" data-stat="behaviorPoint" data-current="100">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-controls">
+                        <button class="btn-action warning" id="resetAllStatsBtn">
+                            <i class="fas fa-redo"></i> Reset All Stats
+                        </button>
+                        <button class="btn-action info" id="loadDefaultStatsBtn">
+                            <i class="fas fa-history"></i> Load Defaults
+                        </button>
+                        <button class="btn-action success" id="exportStatsBtn">
+                            <i class="fas fa-file-export"></i> Export Stats
+                        </button>
+                        <button class="btn-action info" id="importStatsBtn">
+                            <i class="fas fa-file-import"></i> Import Stats
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Playtime Controls -->
                 <div class="admin-section">
                     <h3><i class="fas fa-cogs"></i> Playtime Controls</h3>
                     <div class="control-grid">
@@ -284,6 +480,7 @@
                     </button>
                 </div>
                 
+                <!-- System Statistics -->
                 <div class="admin-section">
                     <h3><i class="fas fa-chart-bar"></i> System Statistics</h3>
                     <div class="stats-grid-admin">
@@ -306,6 +503,37 @@
                     </div>
                 </div>
                 
+                <!-- Sync Management -->
+                <div class="admin-section">
+                    <h3><i class="fas fa-sync"></i> Sync Management</h3>
+                    <div class="sync-controls">
+                        <div class="form-group">
+                            <label for="syncMode">Sync Mode</label>
+                            <select id="syncMode">
+                                <option value="auto">Auto Sync (30s)</option>
+                                <option value="manual">Manual Only</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="syncServer">Sync Server</label>
+                            <input type="text" id="syncServer" value="https://idv.vey-roblox.my.id/sync">
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-action info" id="forceSyncBtn">
+                            <i class="fas fa-sync-alt"></i> Force Sync All
+                        </button>
+                        <button class="btn-action warning" id="resetSyncBtn">
+                            <i class="fas fa-redo"></i> Reset Sync Data
+                        </button>
+                        <button class="btn-action success" id="viewSyncLogBtn">
+                            <i class="fas fa-list"></i> View Sync Log
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Data Management -->
                 <div class="admin-section">
                     <h3><i class="fas fa-redo"></i> Data Management</h3>
                     <p class="warning-text">Warning: These actions cannot be undone!</p>
@@ -322,21 +550,83 @@
                     </div>
                 </div>
                 
+                <!-- System Info -->
                 <div class="admin-section">
                     <h3><i class="fas fa-info-circle"></i> System Info</h3>
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Version:</span>
-                            <span class="info-value">2.1.0 (Auto-Playtime)</span>
+                            <span class="info-value">3.0.0 (Full System)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Device ID:</span>
+                            <span class="info-value" id="adminDeviceId">-</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">LocalStorage:</span>
                             <span class="info-value" id="storageStatus">Checking...</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Last Update:</span>
-                            <span class="info-value" id="lastSystemUpdate">-</span>
+                            <span class="info-label">Last Sync:</span>
+                            <span class="info-value" id="adminLastSync">-</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Info Modal -->
+    <div class="modal-overlay" id="deviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-mobile-alt"></i> Device Information</h2>
+                <button class="close-modal" id="closeDeviceModal">&times;</button>
+            </div>
+            
+            <div class="device-info-section">
+                <div class="device-card">
+                    <h3><i class="fas fa-fingerprint"></i> Device ID</h3>
+                    <div class="device-id-display" id="deviceIdFull">Loading...</div>
+                    <button class="btn-copy" id="copyDeviceIdBtn">
+                        <i class="fas fa-copy"></i> Copy Device ID
+                    </button>
+                </div>
+                
+                <div class="device-stats">
+                    <h3><i class="fas fa-chart-line"></i> Device Statistics</h3>
+                    <div class="stats-grid-device">
+                        <div class="device-stat">
+                            <div class="stat-label">First Seen</div>
+                            <div class="stat-value" id="deviceFirstSeen">-</div>
+                        </div>
+                        <div class="device-stat">
+                            <div class="stat-label">Sync Count</div>
+                            <div class="stat-value" id="deviceSyncCount">0</div>
+                        </div>
+                        <div class="device-stat">
+                            <div class="stat-label">Last Active</div>
+                            <div class="stat-value" id="deviceLastActive">-</div>
+                        </div>
+                        <div class="device-stat">
+                            <div class="stat-label">Playtime Added</div>
+                            <div class="stat-value" id="devicePlaytimeAdded">00:00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="device-controls">
+                    <h3><i class="fas fa-cogs"></i> Device Controls</h3>
+                    <div class="action-buttons">
+                        <button class="btn-action warning" id="regenerateDeviceIdBtn">
+                            <i class="fas fa-redo"></i> New Device ID
+                        </button>
+                        <button class="btn-action danger" id="clearDeviceDataBtn">
+                            <i class="fas fa-trash"></i> Clear Local Data
+                        </button>
+                        <button class="btn-action info" id="exportDeviceDataBtn">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
                     </div>
                 </div>
             </div>
